@@ -6,9 +6,10 @@ import configureStore from "./store/configureStore.js";
 import * as serviceWorker from './serviceWorker';
 import showVisible from "./selectors/expenses.js"
 import {addExpense,editExpense,removeExpense,startSetExpenses} from "./actions/expenses.js"
-import {setStartDate,setEndDate,setTextFilter,sortByAmount,sortByDate} from "./actions/filters.js"
+import {login,logout} from "./actions/auth"
 import {Provider} from "react-redux"
 import {firebase} from "./firebase/firebase.js"
+import {history} from "./routers/AppRouter"
 const store=configureStore();
 
 const jsx=(
@@ -16,17 +17,31 @@ const jsx=(
     <AppRouter></AppRouter>
   </Provider>
 )
-store.dispatch(startSetExpenses()).then(()=>{
-  ReactDOM.render(
-    jsx,
-    document.getElementById('root')
-  );  
-})
+let isRendered=false
+let renderApp=()=>{
+      if(!isRendered){
+        ReactDOM.render(
+          jsx,
+          document.getElementById('root')
+        );  
+        isRendered=true
+      }
+      
+    }
+
 firebase.auth().onAuthStateChanged((user)=>{
   if(user){
-    console.log("signed in")
+    store.dispatch(login(user.uid))
+    store.dispatch(startSetExpenses()).then(()=>{
+      renderApp()
+      if(history.location.pathname==="/"){
+        history.push("/dashboard")
+      }
+    })
   }else{
-    console.log("signed out")
+    store.dispatch(logout())
+    renderApp()
+    history.push("/")
   }
 })
 // If you want your app to work offline and load faster, you can change

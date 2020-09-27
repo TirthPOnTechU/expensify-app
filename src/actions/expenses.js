@@ -15,9 +15,10 @@ export const addExpense=({id,description,note,amount,createdAt})=>({
   }
   )
   export const startAddExpense=({description='',note='', amount=0,createdAt=0}={})=>{
-    return (dispatch)=>{
+    return (dispatch,getState)=>{
+      let uid=getState().auth.id
       let newExpense={description,note,amount,createdAt}
-      firebase.database().ref('expenses').push(newExpense).then((ref)=>{dispatch(addExpense({id:ref.key,...newExpense}))}).catch(error=>{console.log(error)})
+      firebase.database().ref('users/'+uid+"/expenses").push(newExpense).then((ref)=>{dispatch(addExpense({id:ref.key,...newExpense}))}).catch(error=>{console.log(error)})
     }
   }
   export const editExpense=(id,updates)=>({
@@ -26,8 +27,9 @@ export const addExpense=({id,description,note,amount,createdAt})=>({
     updates
   })
   export const startEditExpense=(id,updates)=>{
-    return (dispatch)=>{
-      firebase.database().ref("expenses/"+id).update(updates).then(()=>{
+    return (dispatch,getState)=>{
+      let uid=getState().auth.id
+      firebase.database().ref("users/"+uid+"/expenses/"+id).update(updates).then(()=>{
         dispatch(editExpense(id,updates))
       })
     }
@@ -38,8 +40,9 @@ export const addExpense=({id,description,note,amount,createdAt})=>({
     id
   })
   export const startRemoveExpense=(id)=>{
-    return (dispatch)=>{
-      firebase.database().ref("expenses/"+id).remove().then(()=>{
+    return (dispatch,getState)=>{
+      let uid=getState().auth.id
+      firebase.database().ref("users/"+uid+"/expenses/"+id).remove().then(()=>{
         dispatch(removeExpense({id}))
       })
     }
@@ -51,9 +54,10 @@ export const addExpense=({id,description,note,amount,createdAt})=>({
   }))
 
   export const startSetExpenses=()=>{
-    return (dispatch)=>{
+    return (dispatch,getState)=>{
+      let uid=getState().auth.id
       const expenseList=[]
-      return firebase.database().ref("expenses").once("value").then((snapshot)=>{
+      return firebase.database().ref("users/"+uid+"/expenses").once("value").then((snapshot)=>{
         for(const expense in snapshot.val()){
           expenseList.push({id:expense, description: snapshot.val()[expense].description,note:snapshot.val()[expense].note,amount:snapshot.val()[expense].amount,createdAt:snapshot.val()[expense].createdAt})
         }

@@ -5,10 +5,8 @@ import {startLogout} from "../actions/firebase"
 const Header=(props)=>(
     <header>
       <h1>Header</h1>
-      <NavLink exact={true} activeClassName='is-active' to='/dashboard'>Home</NavLink>
+      <NavLink exact={true} activeClassName='is-active' to='/dashboard'>Dashboard</NavLink>
       <NavLink activeClassName='is-active' to='/create'>Create</NavLink>
-      <NavLink activeClassName='is-active' to='/edit'>Edit</NavLink>
-      <NavLink activeClassName='is-active' to='/help'>Help</NavLink>
       <button onClick={()=>props.dispatch(startLogout())}>Sign Out</button>
     </header>
   )
